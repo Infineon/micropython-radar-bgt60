@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import time
 
 # Open the serial port
-ser = serial.Serial('COM4', 115200, timeout=1)
+ser = serial.Serial('COM15', 115200, timeout=1)
 
 fft_values = []
 distance_values = []

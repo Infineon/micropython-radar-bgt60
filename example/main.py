@@ -1,8 +1,3 @@
-# ====================================
-# Test-Proram:
-# sends fft data over uart to computer
-# Samuel Weissenbacher, 03.2025
-# ====================================
 import time
 import math
 import array
@@ -18,17 +13,17 @@ from machine import Pin
 # 2.) The code sample below
 #     installs the libs using
 #     a given wlan connection
+
 try:
  import BGT60TRXX as BGT
 except ImportError:
-  # Fetch Libs to Memory
-  # Using WLAN of Chip
+  # Fetch libs to memory
+  # Using WiFi of chip.
   nic = network.WLAN()
-  nic.active(True)
-  nic.connect(ssid="<ssid>", key="<password>")
-  
-  # Installs Libs and Dependencies
-  mip.install("github:infineon/micropython-radar-bgt60/")
+  nic.connect(ssid="<your-ssid>", key="<your-key>")
+
+  # Installs libs and dependencies
+  mip.install("github:infineon/micropython-radar-bgt60")
   nic.disconnect()
   import BGT60TRXX as BGT
 
