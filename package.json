@@ -4,7 +4,7 @@
     ["BGT60TRXX_define.py", "github:infineon/micropython-radar-bgt60/micropython-radar-bgt60/BGT60TRXX_define.py"]
   ],
   "deps": [
-    ["github:ederjc/micropython-fourier", "package-installer-mip"]
+    ["github:ederjc/micropython-fourier", "master"]
   ],
   "version": "0.1"
 }

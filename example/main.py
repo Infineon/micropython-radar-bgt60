@@ -28,8 +28,7 @@ except ImportError:
   nic.connect(ssid="<ssid>", key="<password>")
   
   # Installs Libs and Dependencies
-  mip.install("github:infineon/micropython-radar-bgt60/", 
-              version="micropython-radar-bgt60")
+  mip.install("github:infineon/micropython-radar-bgt60/")
   nic.disconnect()
   import BGT60TRXX as BGT
 
