@@ -6,12 +6,32 @@
 import time
 import math
 import array
-import cmath
+import network
+import mip
 
-from machine import Pin, freq
+from machine import Pin
 
-import lib.BGT60TRXX as BGT
-import BGT60TRXX_define as BGT60TR_CONST
+# Libraries can be installed
+# using the MIP via 2 Methods.
+# 1.) Install using mpremote, this has to
+#     be done in a terminal
+# 2.) The code sample below
+#     installs the libs using
+#     a given wlan connection
+try:
+ import BGT60TRXX as BGT
+except ImportError:
+  # Fetch Libs to Memory
+  # Using WLAN of Chip
+  nic = network.WLAN()
+  nic.active(True)
+  nic.connect(ssid="<ssid>", key="<password>")
+  
+  # Installs Libs and Dependencies
+  mip.install("github:infineon/micropython-radar-bgt60/", 
+              version="micropython-radar-bgt60")
+  nic.disconnect()
+  import BGT60TRXX as BGT
 
 # const values
 no_of_chirps = const(1)
