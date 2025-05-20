@@ -1,6 +1,6 @@
 {
   "urls": [
-    ["micropython-radar-bgt60/BGT60TRXX.py", "mlx9micropython-radar-bgt600640/BGT60TRXX.py"],
+    ["micropython-radar-bgt60/BGT60TRXX.py", "micropython-radar-bgt600640/BGT60TRXX.py"],
     ["micropython-radar-bgt60/BGT60TRXX_define.py", "micropython-radar-bgt60/BGT60TRXX_define.py"]
   ],
   "deps": [

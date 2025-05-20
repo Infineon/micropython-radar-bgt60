@@ -7,7 +7,7 @@ import struct
 from machine import SPI, Pin
 
 import BGT60TRXX_define as BGT60TR_CONST
-import micropythonfourier.dftclass as DFT
+import dftclass as DFT
 
 #@micropython.native
 class BGT60TRxxModule:
