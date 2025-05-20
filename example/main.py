@@ -35,8 +35,8 @@ ADC_DIV = const(60)
 start_freq = const(62_500_000) # in kHz
 bandwidth = const(2_000_000) # in kHz
 
-lower_freq_threshold = const(47.0)
-upper_freq_threshold = const(29.0)
+threshold_for_lower_freq = const(47.0)
+threshold_for_upper_freq = const(29.0)
 
 # set radar sensor and standard config
 radar_sensor = BGT.BGT60TRxxModule(words)
@@ -68,13 +68,13 @@ def find_peaks(signal: array.array, threshold_index: int):
   """ detec and print peaks of a given signal.
   As the signal is much higher at the start
   use a rectangle threshold function:
-  x < threshold_index -> use lower_freq_threshold [in dB] for detection
-  else                -> use upper_freq_threshold [in dB] for detection
+  x < threshold_index -> use threshold for lower distances [in dB] for detection
+  else                -> use for higher distances [in dB] for detection
   """
   print(">Peaks detected:")
   for i in range(1, len(signal) - 1):
-    if ((i < threshold_index and signal[i] > lower_freq_threshold) 
-        or (i >= threshold_index and signal[i] > upper_freq_threshold)):
+    if ((i < threshold_index and signal[i] > threshold_for_lower_freq) 
+        or (i >= threshold_index and signal[i] > threshold_for_upper_freq)):
       if signal[i] > signal[i - 1] and signal[i] > signal[i + 1]:
           print(">{:.1f}".format(i*range_resolution / no_of_chirps))
 
