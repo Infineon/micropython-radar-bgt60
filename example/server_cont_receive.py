@@ -32,7 +32,7 @@ while True:
         or "MicroPython" in data_string 
         or "Type" in data_string
         or ">" in data_string):
-        None
+        pass
     elif(data_string):
         end_time = time.time()
         time_diff = end_time - start_time
