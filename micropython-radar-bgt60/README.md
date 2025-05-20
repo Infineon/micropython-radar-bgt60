@@ -4,7 +4,7 @@ and used in Micropython.
 
 ## Things to consider when using this Library
 - As Micropython is much slower than standard C-Code, the speed is a lot worse in Micropython
-    - measured time for a 128-Bit Chirp (Fetch, FFT, High-Pass-Filter and logaritmic scaling):  
+    - measured time for a 128-Bit Chirp (Fetch, FFT, High-Pass-Filter and logarithmic scaling):  
         59.93ms or 16.68Hz  
 - The readFIFO-Function can only transmit 8192 words,
 which consists of 24 Data-Bits
@@ -18,7 +18,7 @@ which consists of 24 Data-Bits
 from lib.BGT60TRXX import BGT60TRxxModule
 
 # Create Instance
-# An optonal parameter can be used to configure
+# An optional parameter can be used to configure
 # the Interrupt-Request to a user-defined function
 radar_sensor = BGT60TRxxModule(<optional function>)
 

@@ -53,7 +53,7 @@ range_resolution = radar_sensor.get_range_resolution() * 100 # in cm
 
 @micropython.native
 def timed_function(f, *args, **kwargs):
-  """ metafunction for caluclating time of function"""
+  """ metafunction for calculating time of function"""
   myname = str(f).split(' ')[1]
   def new_func(*args, **kwargs):
       t = time.ticks_us()
