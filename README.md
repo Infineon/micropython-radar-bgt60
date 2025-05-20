@@ -23,25 +23,18 @@ Typical use cases:
 This module depends on the [micropython-fourier module](https://github.com/peterhinch/micropython-fourier),
 written by Peter Hinch.
 
-TODO: Refer to modified version of module.
+The modified version, which works on PSOC6, is found in [this fork](https://github.com/ederjc/micropython-fourier)
 
-Dependencies can be installed using [mip](https://docs.micropython.org/en/latest/reference/packages.html#installing-packages-with-mip),
-a package manager built-in to MicroPython:
-```
-import mip
-mip.install('github:infineon/TODO')
-```
-
-TODO: Dependency installation might not be needed, if handled in package.json.
+The Dependencies are automatically installed when installing
+the Module.
 
 ## Installation of this Module
-Once the dependencies are installed, this module can be installed using the same method:
+Modules can be installed using [mip](https://docs.micropython.org/en/latest/reference/packages.html#installing-packages-with-mip),
+a package manager built-in to MicroPython:
 ```
 import mip
 mip.install('github:infineon/micropython-radar-bgt60')
 ```
-
-TODO: Add package.json to install library & dependencies automatically.
 
 ## Usage
 
@@ -91,5 +84,6 @@ radar_sensor.startFrame()
 radar_sensor.readFifo()
 
 # Read and calculate Distance-Profile
+# data is stored inside radar_sensor.data
 radar_sensor.readDistance()
 ```
