@@ -3,7 +3,7 @@ With this Library a BGT60TRxx-Sensor can be configured
 and used in Micropython.  
 
 ## Things to consider when using this Library
-- As Micropython is much slower than standard C-Code, the speed is a lot worser in Micropython
+- As Micropython is much slower than standard C-Code, the speed is a lot worse in Micropython
     - measured time for a 128-Bit Chirp (Fetch, FFT, High-Pass-Filter and logaritmic scaling):  
         59.93ms or 16.68Hz  
 - The readFIFO-Function can only transmit 8192 words,
