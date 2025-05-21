@@ -65,7 +65,7 @@ def timed_function(f, *args, **kwargs):
 
 @micropython.native
 def find_peaks(signal: array.array, threshold_index: int):
-  """ detec and print peaks of a given signal.
+  """ detect and print peaks of a given signal.
   As the signal is much higher at the start
   use a rectangle threshold function:
   x < threshold_index -> use threshold for lower distances [in dB] for detection
@@ -82,7 +82,7 @@ fft_data = array.array("f", (0.0 for _ in range(int(radar_sensor.fft.length//2))
 
 @micropython.native
 def fft_to_dB(fft_data: array.array, length: int):
-  """ Recalculate a given string to a logaritmic scale.
+  """ Recalculate a given string to a logarithmic scale.
   Clips signal when to low.
   """
   i:int = 1
