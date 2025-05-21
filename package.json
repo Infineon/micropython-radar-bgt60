@@ -1,0 +1,10 @@
+{
+  "urls": [
+    ["BGT60TRXX.py", "github:infineon/micropython-radar-bgt60/micropython-radar-bgt60/BGT60TRXX.py"],
+    ["BGT60TRXX_define.py", "github:infineon/micropython-radar-bgt60/micropython-radar-bgt60/BGT60TRXX_define.py"]
+  ],
+  "deps": [
+    ["github:ederjc/micropython-fourier", "master"]
+  ],
+  "version": "0.1"
+}
