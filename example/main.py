@@ -101,13 +101,13 @@ def readFIFO(radar_sensor: BGT.BGT60TRxxModule):
   global fft_data
   radar_sensor.readDistance()
   
-  len = radar_sensor.fft.length//2
-   
-  for x in range(len):
-    fft_data[x] = abs(radar_sensor.fft.re[x] + radar_sensor.fft.im[x]*1j)
-  BGT.checkData(fft_data, len)
+  length = radar_sensor.fft.length//2
 
-  fft_to_dB(fft_data, len)
+  for x in range(length):
+    fft_data[x] = abs(radar_sensor.fft.re[x] + radar_sensor.fft.im[x]*1j)
+  BGT.checkData(fft_data, length)
+
+  fft_to_dB(fft_data, length)
 
   # enable line to also print detected peaks in cm
   find_peaks(fft_data, 70/(range_resolution/ no_of_chirps))
