@@ -119,18 +119,6 @@ def button_pressed(event):
   global was_button_pressed
   was_button_pressed = True
 
-@micropython.native
-def printString(radar_sensor: BGT.BGT60TRxxModule):
-  """ prints calculated data in fft_data.
-  Format: <distance>,<data>;
-  """
-  global fft_data
-  data_string = ""
-  for x in range(radar_sensor.fft.length//2):
-      distance = x*range_resolution / no_of_chirps
-      data_string += "{:.1f},{:.2f};".format(distance, fft_data[x])
-  print(data_string)
-
 def main():
   UserButton = Pin("P5_2", mode=Pin.IN, pull=Pin.PULL_UP)
   UserButton.irq(handler=button_pressed,trigger=Pin.IRQ_FALLING)
@@ -143,8 +131,6 @@ def main():
 
   while(not was_button_pressed):
     readFIFO(radar_sensor)
-    #movingAverageFilter(radar_sensor)
-    #printString(radar_sensor)
     radar_sensor.resetFIFO()
     radar_sensor.startFrame()
     
