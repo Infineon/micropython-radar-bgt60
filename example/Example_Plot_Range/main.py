@@ -133,9 +133,9 @@ def printString(radar_sensor: BGT.BGT60TRxxModule):
   print(data_string)
 
 def main():
-  UserButton = Pin("P5_2", mode=Pin.IN, pull=Pin.PULL_UP)
-  UserButton.irq(handler=button_pressed,trigger=Pin.IRQ_FALLING)
-  UserLED = Pin("P5_3", mode=Pin.OUT, value=0)
+  user_button = Pin("P5_2", mode=Pin.IN, pull=Pin.PULL_UP)
+  user_button.irq(handler=button_pressed,trigger=Pin.IRQ_FALLING)
+  user_led = Pin("P5_3", mode=Pin.OUT, value=0)
 
   
   radar_sensor.reset()
@@ -148,7 +148,7 @@ def main():
     radar_sensor.resetFIFO()
     radar_sensor.startFrame()
     
-  UserLED.value(1)
+  user_led.value(1)
 
 if __name__ == "__main__":
     main()
