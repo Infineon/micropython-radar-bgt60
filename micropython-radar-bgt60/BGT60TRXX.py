@@ -13,21 +13,13 @@ import dftclass as DFT
 class BGT60TRxxModule:
   """Implementation of an BGT60-Radar sensor using one antenna"""
 
-  def __init__(self, word_size: int, interrupt_handler=None):
+  def __init__(self, word_size: int, spi_interface: SPI, chip_select: Pin, reset: Pin, interrupt_pin: Pin = None, interrupt_handler=None):
     # Create SPI Peripheral with 50 MHz
     #=========================================
-    self.spi = SPI(
-        baudrate=50_000_000, 
-        polarity=0, 
-        phase=0, 
-        bits=8, 
-        firstbit=SPI.MSB, 
-        sck='P12_2', 
-        mosi='P12_0', 
-        miso='P12_1')
+    self.spi = spi_interface
     
-    self.cs = Pin("P12_3", mode=Pin.OUT, value=1)
-    self.reset_radar = Pin("P11_1", mode=Pin.OUT, value=1)
+    self.cs = Pin(chip_select, mode=Pin.OUT, value=1)
+    self.reset_radar = Pin(reset, mode=Pin.OUT, value=1)
 
     # Transfer of SPI Interface
     #============================
@@ -62,7 +54,7 @@ class BGT60TRxxModule:
     # Enable Interrupt Request when a Function is given
     #===================================================
     if(interrupt_handler is not None):
-      self.irq_radar = Pin("P11_0", 
+      self.irq_radar = Pin(interrupt_pin, 
                            mode=Pin.IN, 
                            pull=Pin.PULL_UP)
       self.irq_radar.irq(handler=interrupt_handler,

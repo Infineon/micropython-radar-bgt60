@@ -4,7 +4,7 @@ import array
 import network
 import mip
 
-from machine import Pin
+from machine import Pin, SPI
 
 # Libraries can be installed
 # using the MIP via 2 Methods.
@@ -38,8 +38,19 @@ bandwidth = const(2_000_000) # in kHz
 threshold_for_lower_freq = const(45.0)
 threshold_for_upper_freq = const(24.5)
 
+# set spi interface for communication
+spi_interface = SPI(
+        baudrate=50_000_000, 
+        polarity=0, 
+        phase=0, 
+        bits=8, 
+        firstbit=SPI.MSB, 
+        sck='P12_2', 
+        mosi='P12_0', 
+        miso='P12_1')
+
 # set radar sensor and standard config
-radar_sensor = BGT.BGT60TRxxModule(words)
+radar_sensor = BGT.BGT60TRxxModule(words, spi_interface, Pin("P12_3"), Pin("P11_1"), Pin("P11_0"))
 radar_sensor.set_adc_div(ADC_DIV)
 radar_sensor.set_chirp_len(samples_per_chirp)
 
