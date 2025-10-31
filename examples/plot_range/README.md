@@ -15,7 +15,7 @@ The server-program (runs on PC) uses this and plots the results.
  > The Serial Port inside of the program needs to be changed to
  > the port you're using.
 
- ![Distance_Profile](Distance-Profile.png)
+ ![Distance_Profile](distance_profile.png)
 
  Terminal output consisting of:
  1) Time needed for function

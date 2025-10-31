@@ -6,7 +6,7 @@ The threshold function is defined using the find_nearest_peak function.
 This function utilizes two predefined values: threshold_for_upper_freq and threshold_for_lower_freq. 
 
 Between the defined start and end indices, a linear function is generated to determine the threshold. For a visual representation, please refer to the image below.
-![Threshold Function](Threshold_function.png)
+![Threshold function](threshold_function.png)
 
 ## Usage
 1) Upload the ```main.py``` to the microcontroller
