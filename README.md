@@ -1,6 +1,6 @@
 # MicroPython Driver for 60 GHz Radar Sensors
 
-![MicroPython Logo](docs/img/micropython_logo.png)
+<img src="docs/img/micropython_logo.png" width=150>
 
 With this library Infineon's XENSIV™ BGT60TR13C 60 GHz radar sensor can be configured
 and used with [MicroPython](https://github.com/Infineon/micropython) via SPI.
