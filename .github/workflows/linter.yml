@@ -1,0 +1,21 @@
+name: Linter
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  Ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/ruff-action@v3
+        with:
+          version-file: .ruff.toml
+          lint-and-format-check: true
