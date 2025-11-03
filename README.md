@@ -39,8 +39,6 @@ If you have a different MicroPython-compatible board, please refer to the [offic
 This module depends on the [micropython-fourier module](https://github.com/peterhinch/micropython-fourier),
 written by Peter Hinch.
 
-A modified version compatible with PSOC™ 6 is available in [this fork](https://github.com/ederjc/micropython-fourier).
-
 The dependencies are automatically installed when installing the module using the method described below.
 
 ### Installation of this Module
@@ -60,10 +58,10 @@ mip.install('github:infineon/micropython-radar-bgt60')
 
 #### Manual Installation
 - Download these files from the micropython-fourier repository:
-    - [dft.py](https://raw.githubusercontent.com/ederjc/micropython-fourier/refs/heads/master/dft.py)
-    - [dftclass.py](https://raw.githubusercontent.com/ederjc/micropython-fourier/refs/heads/master/dftclass.py)
-    - [window.py](https://raw.githubusercontent.com/ederjc/micropython-fourier/refs/heads/master/window.py)
-    - [polar.py](https://raw.githubusercontent.com/ederjc/micropython-fourier/refs/heads/master/polar.py)
+    - [dft.py](https://raw.githubusercontent.com/peterhinch/micropython-fourier/refs/heads/master/dft.py)
+    - [dftclass.py](https://raw.githubusercontent.com/peterhinch/micropython-fourier/refs/heads/master/dftclass.py)
+    - [window.py](https://raw.githubusercontent.com/peterhinch/micropython-fourier/refs/heads/master/window.py)
+    - [polar.py](https://raw.githubusercontent.com/peterhinch/micropython-fourier/refs/heads/master/polar.py)
 - Download these files from this repository:
     - [BGT60TRXX.py](https://raw.githubusercontent.com/Infineon/micropython-radar-bgt60/refs/heads/main/micropython-radar-bgt60/BGT60TRXX.py)
     - [BGT60TRXX_define.py](https://raw.githubusercontent.com/Infineon/micropython-radar-bgt60/refs/heads/main/micropython-radar-bgt60/BGT60TRXX_define.py)
