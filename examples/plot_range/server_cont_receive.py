@@ -3,69 +3,99 @@ import matplotlib.pyplot as plt
 import time
 
 # Open the serial port
-ser = serial.Serial('COM15', 115200, timeout=1)
+ser = serial.Serial('COM4', 115200, timeout=1)
 
+# Data containers for FFT and threshold values
 fft_values = []
-distance_values = []
+fft_distance_values = []
+threshold_values = []
+threshold_distance_values = []
 
+# Send initialization command
 ser.write(b"fin\n")
 
+# Mark the start time
 start_time = time.time()
 
-# Create a figure with multiple subplots
-fig, axs = plt.subplots(1, figsize=(9, 20))
-axs.set_xlabel("Distance")
-axs.set_ylabel("Amplitude")
-axs.set_title("FFT Data")
+# Create a figure with a single subplot
+fig, ax = plt.subplots(figsize=(9, 6))
+ax.set_xlabel("Distance")
+ax.set_ylabel("Amplitude")
+ax.set_title("FFT and Threshold Data")
 
 plt.ion()  # Enable interactive mode
 
 while True:
-    # Read a line from the serial port
-    data_string = ser.readline().decode('utf-8').strip()
+    try:
+        # Read a line from the serial port
+        data_string = ser.readline().decode('utf-8').strip()
 
-    # Check if the data string is a system message
-    if ("Virtual File System:" in data_string 
-        or "fin" in data_string 
-        or "Register IRQ-Event" in data_string 
-        or ">>>" in data_string 
-        or "MicroPython" in data_string 
-        or "Type" in data_string
-        or ">" in data_string):
-        pass
-    elif(data_string):
-        end_time = time.time()
-        time_diff = end_time - start_time
-        print("Time difference:", time_diff, "seconds")
-        # Split the data string into individual data points
-        data_points = data_string.split(';')
-        
-        for data_point in data_points:
-            if data_point:  # Check if the data point is not empty
-                # Split the data point into distance and amplitude
-                distance, amplitude = data_point.split(',')
-                distance = float(distance)
-                amplitude = float(amplitude)
+        # Check if the data string is a system message to ignore
+        if ("Virtual File System:" in data_string 
+            or "fin" in data_string 
+            or "Register IRQ-Event" in data_string 
+            or ">>>" in data_string 
+            or "MicroPython" in data_string 
+            or "Type" in data_string
+            or ">" in data_string):
+            pass
+        elif data_string:
+            # Record the time difference for statistics
+            end_time = time.time()
+            time_diff = end_time - start_time
+            print("Time difference:", time_diff, "seconds")
+            
+            # Split the input into individual data points
+            data_points = data_string.split(';')  # Split the incoming data into points
+            fft_data_incoming = False
+            for data_point in data_points:
+                if "fft" in data_point:
+                    fft_values = []
+                    fft_distance_values = []
+                    fft_data_incoming = True
                 
-                # Append the values to the lists
-                distance_values.append(distance)
-                fft_values.append(amplitude)
+                elif "threshold" in data_point:
+                    threshold_values = []
+                    threshold_distance_values = []
+                    fft_data_incoming = False
 
-        # Clear the current plot
-        axs.clear()
-        axs.set_xlabel("Distance")
-        axs.set_ylabel("Amplitude")
-        axs.set_title("FFT Data")
+                elif data_point: # Check if data point is not empty
+                    try:
+                        distance, amplitude = data_point.split(',')
+                    except ValueError:
+                        break # Skip malformed data points
+                    if(fft_data_incoming):
+                        fft_distance_values.append(float(distance))
+                        fft_values.append(float(amplitude))
+                    else:
+                        threshold_distance_values.append(float(distance))
+                        threshold_values.append(float(amplitude))
+                        
+            # Clear the current plot for updates
+            ax.clear()
+            ax.set_xlabel("Distance")
+            ax.set_ylabel("Amplitude")
+            ax.set_title("FFT and Threshold Data")
 
-        # Plot the FFT data
-        axs.plot(distance_values, fft_values)
+            # Plot the FFT data
+            ax.plot(fft_distance_values, fft_values, label="FFT Data", color="blue")
 
-        # Update the plot
-        plt.pause(0.1)
+            # Plot the threshold data
+            ax.plot(threshold_distance_values, threshold_values, label="Threshold Data", color="red", linestyle="--")
 
-        ser.write(b"fin\n")
-        start_time = time.time()
+            # Add a legend to distinguish between the two streams
+            ax.legend()
 
-        ## Reset the list of ADC values
-        fft_values = []
-        distance_values = []
+            # Update the plot
+            plt.pause(0.1)
+
+            # Send an acknowledgment or further instruction to the device
+            ser.write(b"fin\n")
+            start_time = time.time()
+
+    except KeyboardInterrupt:
+        print("Exiting...")
+        break
+
+# Close the serial port after exiting
+ser.close()
