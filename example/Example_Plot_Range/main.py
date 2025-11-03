@@ -35,8 +35,8 @@ ADC_DIV = const(60)
 start_freq = const(62_500_000) # in kHz
 bandwidth = const(2_000_000) # in kHz
 
-threshold_for_lower_freq = const(47.0)
-threshold_for_upper_freq = const(29.0)
+threshold_for_lower_freq = const(45.0)
+threshold_for_upper_freq = const(28.5)
 
 # set spi interface for communication
 spi_interface = SPI(
@@ -74,20 +74,37 @@ def timed_function(f, *args, **kwargs):
       return result
   return new_func
 
-@micropython.native
-def find_peaks(signal: array.array, threshold_index: int):
-  """ detect and print peaks of a given signal.
-  As the signal is much higher at the start
-  use a rectangle threshold function:
-  x < threshold_index -> use threshold for lower distances [in dB] for detection
-  else                -> use for higher distances [in dB] for detection
+threshold_func = array.array("f", (threshold_for_lower_freq for _ in range(int(radar_sensor.fft.length//2))))
+def buildThresholdFunction(threshold_index_start: int, threshold_index_end: int):
+  """ prints threshold function
+  Uses following Threshold Function:
+    if x < start -> threshold_for_lower_freq
+    if x > end   -> threshold_for_upper_freq
+    else         -> build linear function between first two
   """
-  print(">Peaks detected:")
-  for i in range(1, len(signal) - 1):
-    if ((i < threshold_index and signal[i] > threshold_for_lower_freq) 
-        or (i >= threshold_index and signal[i] > threshold_for_upper_freq)):
-      if signal[i] > signal[i - 1] and signal[i] > signal[i + 1]:
-          print(">{:.1f}".format(i*range_resolution / no_of_chirps))
+  global threshold_func
+  for i in range(len(threshold_func)):
+    if (i < threshold_index_start):
+      threshold_func[i] = threshold_for_lower_freq
+    elif(i > threshold_index_end):
+      threshold_func[i] = threshold_for_upper_freq
+    else:
+      # kx + d
+      threshold_func[i] = (-((threshold_for_lower_freq-threshold_for_upper_freq)
+                             /(threshold_index_end-threshold_index_start))
+                           *(i-threshold_index_start) 
+                           + threshold_for_lower_freq)
+
+def printThreshold():
+  """ prints threshold function.
+  Format: threshold;<distance>,<data>;
+  """
+  global threshold_func
+  data_string = "threshold;"
+  for x in range(radar_sensor.fft.length//2):
+      distance = x*range_resolution / no_of_chirps
+      data_string += "{:.1f},{:.2f};".format(distance, threshold_func[x])
+  print(data_string)
 
 fft_data = array.array("f", (0.0 for _ in range(int(radar_sensor.fft.length//2))))
 
@@ -119,9 +136,7 @@ def readFIFO(radar_sensor: BGT.BGT60TRxxModule):
   BGT.checkData(fft_data, length)
 
   fft_to_dB(fft_data, length)
-
-  # enable line to also print detected peaks in cm
-  find_peaks(fft_data, 70/(range_resolution/ no_of_chirps))
+  
 
 was_button_pressed = False
 def button_pressed(event):
@@ -134,10 +149,10 @@ def button_pressed(event):
 @micropython.native
 def printString(radar_sensor: BGT.BGT60TRxxModule):
   """ prints calculated data in fft_data.
-  Format: <distance>,<data>;
+  Format: fft;<distance>,<data>;
   """
   global fft_data
-  data_string = ""
+  data_string = "fft;"
   for x in range(radar_sensor.fft.length//2):
       distance = x*range_resolution / no_of_chirps
       data_string += "{:.1f},{:.2f};".format(distance, fft_data[x])
@@ -153,9 +168,14 @@ def main():
   radar_sensor.initSensor()
   radar_sensor.startFrame()
 
+  # Buld threshold function once
+  buildThresholdFunction(50/(range_resolution/ no_of_chirps), 
+                         190/(range_resolution/ no_of_chirps))
+
   while(not was_button_pressed):
     readFIFO(radar_sensor)
     printString(radar_sensor)
+    printThreshold()
     radar_sensor.resetFIFO()
     radar_sensor.startFrame()
     
