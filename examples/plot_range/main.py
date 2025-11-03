@@ -49,6 +49,17 @@ spi_interface = SPI(
         mosi='P12_0', 
         miso='P12_1')
 
+# set spi interface for communication
+spi_interface = SPI(
+        baudrate=50_000_000, 
+        polarity=0, 
+        phase=0, 
+        bits=8, 
+        firstbit=SPI.MSB, 
+        sck='P12_2', 
+        mosi='P12_0', 
+        miso='P12_1')
+
 # set radar sensor and standard config
 radar_sensor = BGT.BGT60TRxxModule(words, spi_interface, Pin("P12_3"), Pin("P11_1"), Pin("P11_0"))
 radar_sensor.set_adc_div(ADC_DIV)
