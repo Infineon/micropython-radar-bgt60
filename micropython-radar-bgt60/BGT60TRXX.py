@@ -3,6 +3,8 @@
 # Samuel Weissenbacher, 03.2025
 # =============================
 import struct
+import array
+import math
 
 from machine import SPI, Pin
 
@@ -50,6 +52,7 @@ class BGT60TRxxModule:
     # Init FFT
     #============
     self.fft = DFT.DFT(self.word_size)
+    self.fft_data = array.array('f', (0 for x in range(self.word_size)))
 
     # Enable Interrupt Request when a Function is given
     #===================================================
@@ -322,8 +325,71 @@ class BGT60TRxxModule:
       y0 = x0*0.943 - x1*1.885 + x2*0.943 + y1*1.881 - y2*0.890 # Chebyshev 2nd Order
       self.fft.re[i] = y0
       i += 1
-    
+
+  @micropython.viper
+  def runAntiCouplingFilter(self):
+    """Anti Coupling filter for 
+    Reciever/Transmitter Antenna
+    """
+    # Calculation: Typical: sig - mov_avg
+    # y[i] = x[i] - 1/N sum_(k = i - (N-1))^(i)(x[k])
+    # y[i] = (N-1)/N * x[i] - 1/N sum_(k = i - (N-1))^(i-1)(x[k])
+    # Meaning: b0 = (N-1)/N
+    # all other bx = -1/N
+    # For Decoupling we use a broad moving average to
+    # calculate reflections out: N=10
+    x0: float = 0.0
+    x1: float = 0.0
+    x2: float = 0.0
+    x3: float = 0.0
+    x4: float = 0.0
+    x5: float = 0.0
+    x6: float = 0.0
+    x7: float = 0.0
+    x8: float = 0.0
+    x9: float = 0.0
+    i: int = 0
+    N: float = 10.0
+    bx : float = -0.1 # -1/N
+    b0 : float = 0.9 # (N-1)/N
+    limit: int = int(self.word_size)
+    while i < limit:
+      x9 = x8
+      x8 = x7
+      x7 = x6
+      x6 = x5
+      x5 = x4
+      x4 = x3
+      x3 = x2
+      x2 = x1
+      x1 = x0
+      x0 = float(self.fft_data[i])
+      y0 = x0*b0 + x1*bx + x2*bx + x3*bx + x4*bx + x5*bx + x6*bx + x7*bx + x8*bx + x9*bx
+      self.fft.re[i] = y0
+      i += 1
       
+    # Nearer Targets get detected much better,
+    # but we want to have one threshold level to detect
+    # every value. Decreasing it using a linear function
+    # helps here
+    n: int = 0
+    k: float = 80.0  # Initial adjustment value
+    while n < int(self.word_size):
+        if k > 0.0:
+          if (self.fft_data[n] < k):
+            self.fft_data[n] = 0
+          else:
+            self.fft_data[n] -= k
+          k -= 1.5
+        n += 1
+        
+    # Using the filter, reflections should be calculated out
+    # To remove coupling between Rx and Tx decrease the values from the first 3 values
+    j : int = 0
+    while(j < 3):
+      self.fft_data[j] = 0.0
+      j += 1
+
   @micropython.viper
   def readDistance(self):
     """ Reads FIFO and
@@ -334,8 +400,25 @@ class BGT60TRxxModule:
     """
     self.readFifo()
     self.unpackRecData()
-    self.runHighPassFilter()
-    self.fft.run(DFT.FORWARD)    
+    self.runHighPassFilter()  
+    self.fft.run(DFT.FORWARD)  
+    self.fft_to_dB()
+    self.fillFFT_data()
+    self.runAntiCouplingFilter()
+
+  @micropython.native
+  def fillFFT_data(self):
+    for x in range(self.word_size):
+      self.fft_data[x] = abs(self.fft.re[x] + self.fft.im[x]*1j)
+  
+  @micropython.native
+  def fft_to_dB(self):
+    """ Recalculate a given string to a logarithmic scale.
+    """
+    for i in range(self.word_size):
+      self.fft_data[i] = max(0.001, self.fft_data[i])
+      # calculate to dB-Scale
+      self.fft_data[i] = (20.0 * math.log10(self.fft_data[i]))
 
   # inits sensor with all necessary register values.
   # Can set a compare value in percent of the fifo stack 

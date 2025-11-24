@@ -1,6 +1,47 @@
 import serial
 import matplotlib.pyplot as plt
 import time
+import numpy as np
+
+def reduce_noise_with_moving_average(signal, window_size=10):
+    """
+    Reduces noise by calculating a broad moving average and subtracting it 
+    from the signal, preserving peaks but reducing overall noise.
+
+    Parameters:
+        signal (list): The original signal values (e.g., FFT amplitudes).
+        window_size (int): The width of the moving average (should be relatively large).
+
+    Returns:
+        np.array: Noise-reduced signal with the moving average subtracted.
+    """
+    # Check for valid window size
+    if window_size % 2 == 0:
+        window_size += 1  # Ensure the window size is odd
+    if len(signal) < window_size:
+        raise ValueError("Signal length must be greater than the window size")
+
+
+    # Calculate broad moving average
+    moving_avg = np.convolve(signal, np.ones(window_size) / window_size, mode='same')
+
+    # Subtract moving average from original signal
+    noise_reduced_signal = np.array(signal) - moving_avg
+    
+    # Because of Leakage-effects, the first two values are too high (transmitter direct to reciever)
+    noise_reduced_signal[0] = noise_reduced_signal[0]-20
+    noise_reduced_signal[1] = noise_reduced_signal[1]-20
+    noise_reduced_signal[2] = noise_reduced_signal[2]-20
+    noise_reduced_signal[3] = noise_reduced_signal[3]-20
+    noise_reduced_signal[4] = noise_reduced_signal[4]-5
+    
+
+    # Clip values to ensure non-negative output
+    noise_reduced_signal = np.clip(noise_reduced_signal, 0, None)  # Negative values -> 0
+    
+    moving_avg_filtered = np.convolve(noise_reduced_signal, np.ones(3), mode='same')
+
+    return moving_avg_filtered
 
 # Open the serial port
 ser = serial.Serial('COM4', 115200, timeout=1)
@@ -10,6 +51,7 @@ fft_values = []
 fft_distance_values = []
 threshold_values = []
 threshold_distance_values = []
+window_size = 10  # Window size for moving average
 
 # Send initialization command
 ser.write(b"fin\n")
@@ -22,15 +64,12 @@ fig, ax = plt.subplots(figsize=(9, 6))
 ax.set_xlabel("Distance")
 ax.set_ylabel("Amplitude")
 ax.set_title("FFT and Threshold Data")
-
 plt.ion()  # Enable interactive mode
 
 while True:
     try:
         # Read a line from the serial port
         data_string = ser.readline().decode('utf-8').strip()
-
-        # Check if the data string is a system message to ignore
         if ("Virtual File System:" in data_string 
             or "fin" in data_string 
             or "Register IRQ-Event" in data_string 
@@ -58,44 +97,45 @@ while True:
                     threshold_values = []
                     threshold_distance_values = []
                     fft_data_incoming = False
-
                 elif data_point: # Check if data point is not empty
                     try:
                         distance, amplitude = data_point.split(',')
                     except ValueError:
                         break # Skip malformed data points
-                    if(fft_data_incoming):
+                    if fft_data_incoming:
                         fft_distance_values.append(float(distance))
                         fft_values.append(float(amplitude))
                     else:
                         threshold_distance_values.append(float(distance))
                         threshold_values.append(float(amplitude))
                         
-            # Clear the current plot for updates
-            ax.clear()
-            ax.set_xlabel("Distance")
-            ax.set_ylabel("Amplitude")
-            ax.set_title("FFT and Threshold Data")
-
-            # Plot the FFT data
-            ax.plot(fft_distance_values, fft_values, label="FFT Data", color="blue")
-
-            # Plot the threshold data
-            ax.plot(threshold_distance_values, threshold_values, label="Threshold Data", color="red", linestyle="--")
-
-            # Add a legend to distinguish between the two streams
-            ax.legend()
-
+            # Apply distance filtering; you can adjust the window size
+            if( len(fft_distance_values) > window_size):
+                #filtered_amplitudes = reduce_noise_with_moving_average(fft_values)
+            
+                # Clear the current plot for updates
+                ax.clear()
+                ax.set_xlabel("Distance in cm")
+                ax.set_ylabel("Amplitude in dB")
+                ax.set_title("FFT and Threshold Data")
+                
+                # Plot the FFT data using filtered distances
+                ax.plot(fft_distance_values, fft_values, label="Filtered FFT Data", color="blue")
+                
+                # Plot the threshold data using raw distance values
+                ax.plot(threshold_distance_values, threshold_values, label="Threshold Data", color="red", linestyle="--")
+                
+                # Add a legend to distinguish between the two streams
+                ax.legend()
+            
             # Update the plot
             plt.pause(0.1)
-
+            
             # Send an acknowledgment or further instruction to the device
             ser.write(b"fin\n")
             start_time = time.time()
-
     except KeyboardInterrupt:
         print("Exiting...")
         break
-
 # Close the serial port after exiting
 ser.close()
