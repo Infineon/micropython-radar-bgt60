@@ -3,46 +3,6 @@ import matplotlib.pyplot as plt
 import time
 import numpy as np
 
-def reduce_noise_with_moving_average(signal, window_size=10):
-    """
-    Reduces noise by calculating a broad moving average and subtracting it 
-    from the signal, preserving peaks but reducing overall noise.
-
-    Parameters:
-        signal (list): The original signal values (e.g., FFT amplitudes).
-        window_size (int): The width of the moving average (should be relatively large).
-
-    Returns:
-        np.array: Noise-reduced signal with the moving average subtracted.
-    """
-    # Check for valid window size
-    if window_size % 2 == 0:
-        window_size += 1  # Ensure the window size is odd
-    if len(signal) < window_size:
-        raise ValueError("Signal length must be greater than the window size")
-
-
-    # Calculate broad moving average
-    moving_avg = np.convolve(signal, np.ones(window_size) / window_size, mode='same')
-
-    # Subtract moving average from original signal
-    noise_reduced_signal = np.array(signal) - moving_avg
-    
-    # Because of Leakage-effects, the first two values are too high (transmitter direct to reciever)
-    noise_reduced_signal[0] = noise_reduced_signal[0]-20
-    noise_reduced_signal[1] = noise_reduced_signal[1]-20
-    noise_reduced_signal[2] = noise_reduced_signal[2]-20
-    noise_reduced_signal[3] = noise_reduced_signal[3]-20
-    noise_reduced_signal[4] = noise_reduced_signal[4]-5
-    
-
-    # Clip values to ensure non-negative output
-    noise_reduced_signal = np.clip(noise_reduced_signal, 0, None)  # Negative values -> 0
-    
-    moving_avg_filtered = np.convolve(noise_reduced_signal, np.ones(3), mode='same')
-
-    return moving_avg_filtered
-
 # Open the serial port
 ser = serial.Serial('COM4', 115200, timeout=1)
 
@@ -51,7 +11,6 @@ fft_values = []
 fft_distance_values = []
 threshold_values = []
 threshold_distance_values = []
-window_size = 10  # Window size for moving average
 
 # Send initialization command
 ser.write(b"fin\n")
@@ -109,10 +68,8 @@ while True:
                         threshold_distance_values.append(float(distance))
                         threshold_values.append(float(amplitude))
                         
-            # Apply distance filtering; you can adjust the window size
-            if( len(fft_distance_values) > window_size):
-                #filtered_amplitudes = reduce_noise_with_moving_average(fft_values)
-            
+            # Plotting the data
+            if( len(fft_distance_values) > 0 and len(threshold_distance_values) > 0):            
                 # Clear the current plot for updates
                 ax.clear()
                 ax.set_xlabel("Distance in cm")
