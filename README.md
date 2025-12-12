@@ -1,5 +1,7 @@
 # MicroPython Driver for XENSIV™ BGT60TR13C 60 GHz Radar Sensors
 
+[![Check links](https://github.com/Infineon/micropython-radar-bgt60/actions/workflows/check_links.yml/badge.svg)](https://github.com/Infineon/micropython-radar-bgt60/actions/workflows/check_links.yml)
+
 <img src="docs/img/micropython_logo.png" height=80>
 
 With this library Infineon's XENSIV™ BGT60TR13C 60 GHz radar sensor can be configured
