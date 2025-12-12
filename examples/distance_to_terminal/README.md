@@ -2,11 +2,8 @@
 This example program reads data from the BGT60TR13C radar sensor on the CY8CKIT-062S2-AI Kit from Infineon and prints the distance of the nearest object to the terminal.
 
 ## Threshold Function
-The threshold function is defined using the find_nearest_peak function.  
-This function utilizes two predefined values: threshold_for_upper_freq and threshold_for_lower_freq. 
-
-Between the defined start and end indices, a linear function is generated to determine the threshold. For a visual representation, please refer to the image below.
-![Threshold function](threshold_function.png)
+To detect a distance a threshold is used.
+This needs to be calibrated using the Plot-Range-Example Program.
 
 ## Usage
 1) Upload the ```main.py``` to the microcontroller

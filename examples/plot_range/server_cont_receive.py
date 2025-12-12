@@ -1,6 +1,7 @@
 import serial
 import matplotlib.pyplot as plt
 import time
+import numpy as np
 
 # Open the serial port
 ser = serial.Serial('COM4', 115200, timeout=1)
@@ -22,15 +23,12 @@ fig, ax = plt.subplots(figsize=(9, 6))
 ax.set_xlabel("Distance")
 ax.set_ylabel("Amplitude")
 ax.set_title("FFT and Threshold Data")
-
 plt.ion()  # Enable interactive mode
 
 while True:
     try:
         # Read a line from the serial port
         data_string = ser.readline().decode('utf-8').strip()
-
-        # Check if the data string is a system message to ignore
         if ("Virtual File System:" in data_string 
             or "fin" in data_string 
             or "Register IRQ-Event" in data_string 
@@ -58,44 +56,43 @@ while True:
                     threshold_values = []
                     threshold_distance_values = []
                     fft_data_incoming = False
-
                 elif data_point: # Check if data point is not empty
                     try:
                         distance, amplitude = data_point.split(',')
                     except ValueError:
                         break # Skip malformed data points
-                    if(fft_data_incoming):
+                    if fft_data_incoming:
                         fft_distance_values.append(float(distance))
                         fft_values.append(float(amplitude))
                     else:
                         threshold_distance_values.append(float(distance))
                         threshold_values.append(float(amplitude))
                         
-            # Clear the current plot for updates
-            ax.clear()
-            ax.set_xlabel("Distance")
-            ax.set_ylabel("Amplitude")
-            ax.set_title("FFT and Threshold Data")
-
-            # Plot the FFT data
-            ax.plot(fft_distance_values, fft_values, label="FFT Data", color="blue")
-
-            # Plot the threshold data
-            ax.plot(threshold_distance_values, threshold_values, label="Threshold Data", color="red", linestyle="--")
-
-            # Add a legend to distinguish between the two streams
-            ax.legend()
-
+            # Plotting the data
+            if( len(fft_distance_values) > 0 and len(threshold_distance_values) > 0):            
+                # Clear the current plot for updates
+                ax.clear()
+                ax.set_xlabel("Distance in cm")
+                ax.set_ylabel("Amplitude in dB")
+                ax.set_title("FFT and Threshold Data")
+                
+                # Plot the FFT data using filtered distances
+                ax.plot(fft_distance_values, fft_values, label="Filtered FFT Data", color="blue")
+                
+                # Plot the threshold data using raw distance values
+                ax.plot(threshold_distance_values, threshold_values, label="Threshold Data", color="red", linestyle="--")
+                
+                # Add a legend to distinguish between the two streams
+                ax.legend()
+            
             # Update the plot
             plt.pause(0.1)
-
+            
             # Send an acknowledgment or further instruction to the device
             ser.write(b"fin\n")
             start_time = time.time()
-
     except KeyboardInterrupt:
         print("Exiting...")
         break
-
 # Close the serial port after exiting
 ser.close()
