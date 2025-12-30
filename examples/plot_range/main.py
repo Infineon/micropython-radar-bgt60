@@ -10,6 +10,7 @@ import time
 import array
 import network
 import mip
+import math
 
 from machine import Pin, SPI
 
@@ -25,14 +26,14 @@ from machine import Pin, SPI
 # Library Import with Auto-Install
 # ===========================
 try:
- import BGT60TRXX as BGT
+  import BGT60TRXX as BGT
 except ImportError:
   print("BGT60TRXX library not found. Installing from GitHub...")
 
   # Connect to WiFi
   nic = network.WLAN()
   nic.connect(ssid="<your-ssid>", key="<your-key>")
-
+  
   # Installs libs and dependencies
   mip.install("github:infineon/micropython-radar-bgt60")
   nic.disconnect()

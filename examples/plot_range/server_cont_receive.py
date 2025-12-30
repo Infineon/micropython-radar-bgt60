@@ -199,7 +199,6 @@ def main():
              
             # Reset start time for next iteration
             start_time = time.time()
-
     except KeyboardInterrupt:
         print("\nExiting...")
     except serial.SerialException as e:
