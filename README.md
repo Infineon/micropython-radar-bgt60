@@ -87,33 +87,56 @@ which consist of 24 data bits
 # import Module
 import BGT60TRXX as BGT
 
+I_PHASE = 0
+
+# Pin Configuration (PSoC 6 specific)
+PIN_SCK = 'P12_2'
+PIN_MOSI = 'P12_0'
+PIN_MISO = 'P12_1'
+PIN_CS = 'P12_3'
+PIN_RESET = 'P11_1'
+PIN_IRQ = 'P11_0'
+
+# set spi interface for communication
+spi_interface = SPI(
+        baudrate=SPI_BAUDRATE, 
+        polarity=SPI_POLARITY, 
+        phase=SPI_PHASE, 
+        bits=8, 
+        firstbit=SPI.MSB, 
+        sck=PIN_SCK, 
+        mosi=PIN_MOSI, 
+        miso=PIN_MISO)
+
 # Create Instance
 # An optonal parameter can be used to configure
 # the Interrupt-Request to a user-defined function
 radar_sensor = BGT.BGT60TRxxModule(<wordsize>, <optional function>)
+radar_sensor = BGT.BGT60TRxxModule(<wordsize>, spi_interface, Pin(PIN_CS), Pin(PIN_RESET), Pin(PIN_IRQ))
+
 
 # Configure Register Values with pre-defined functions
-radar_sensor.setCompareValue(50) # in '%'
+radar_sensor.set_compare_value(50) # in '%'
 #...
 
 # Configures all Registers for Usage
 # They need to be configured before hand
-radar_sensor.initSensor()
+radar_sensor.init_sensor()
 
 data = radar_sensor.read_reg(<ADDR_REG>)
 radar_sensor.write_reg(<ADDR_REG>, <DATA>)
 
 # reset fifo state
-radar_sensor.resetFIFO()
+radar_sensor.reset_fifo()
 
 # start frame generation before a fifo read
-radar_sensor.startFrame()
+radar_sensor.start_frame()
 
 # Reads from the Sensor.
 # data is stored inside radar_sensor.data
-radar_sensor.readFifo()
+radar_sensor.read_FIFO()
 
 # Read and calculate Distance-Profile
 # data is stored inside radar_sensor.data
-radar_sensor.readDistance()
+radar_sensor.read_distance()
 ```
