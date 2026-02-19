@@ -107,26 +107,31 @@ class BGT60TRxxModule:
 
 
   def set_adc_div(self, div: int):
-    """ sets frequency divider of adc. Only enabled with init_sensor-Method """
+    """ 
+    Sets frequency divider of adc. Only enabled with init_sensor-Method 
+    """
     self._update_register_field(
         CONST.ADC0_ADDR, div, 
         CONST.ADC0_DIV_MASK, CONST.ADC0_DIV_OFFSET)
     
   def set_chirp_len(self, chirp_len: int):
-    """ sets chirp length of sensor. Only enabled with init_sensor-Method """
+    """ 
+    Sets chirp length of sensor. Only enabled with init_sensor-Method.
+    """
     self._update_register_field(
         CONST.PLL1_3_ADDR, chirp_len,
         CONST.APU0_MASK, CONST.APU0_OFFSET)
     
   def configure_chirp(self, N_FSU: int, N_RTU: int, N_RSU: int):
-    """ Configures chirp parameters. 
+    """ 
+    Configures chirp parameters. 
     Only enabled with init_sensor-Method.
 
     N_FSU = Starting Frequency
     N_RTU = Clock cycles per chirp
     N_RSU = Frequency step per clock cycle
 
-    For calculation of values see Datasheet
+    For calculation of values see Datasheet.
     """
     self._update_register_field(
             CONST.PLL1_0_ADDR, N_FSU,
@@ -154,7 +159,7 @@ class BGT60TRxxModule:
       gain_configs = {
           1: (CONST.CSU1_2_VGA_GAIN1_MASK, CONST.CSU1_2_VGA_GAIN1_OFFSET),
           2: (CONST.CSU1_2_VGA_GAIN2_MASK, CONST.CSU1_2_VGA_GAIN2_OFFSET),
-          3: (CONST.CSU1_2_VGA_GAIN3_MASK, CONST.CSU1_2_VGA_GAIN3_OFFSET),
+          3: (CONST.CSU1_2_VGA_GAIN3_MASK, CONST.CSU1_2_fVGA_GAIN3_OFFSET),
       }
       
       if channel not in gain_configs:
@@ -164,8 +169,9 @@ class BGT60TRxxModule:
       self._update_register_field(CONST.CSU1_2_ADDR, gain, mask, offset)
     
   def set_compare_value(self, compare_value: int):
-    """ sets compare value using a read-modify-write
-    Only enabled with a init_sensor call
+    """
+    Set compare value using a read-modify-write
+    Only enabled with a init_sensor call.
     """
     if compare_value >= 100:
         value = CONST.FIFO_SIZE - 1
@@ -258,19 +264,17 @@ class BGT60TRxxModule:
   # Can set a compare value in percent of the fifo stack 
   # to when an IRQ is send
   def init_sensor(self):
-    """ inits sensor
-    and writes all registers anew.
-    """
+    """ Initializes sensor and writes all registers anew. """
     for reg_addr, reg_data in self.reg_values.items():
       reg_data = (reg_data & CONST.DATA_MASK) # filter out address
       self.write_reg(reg_addr, reg_data)
 
   def start_frame(self):
-    """ Start frame generation and leave Deep-Sleep-Mode """
+    """ Start frame generation and leave Deep-Sleep-Mode. """
     self._set_bits(CONST.MAIN_ADDR, CONST.START_FRAME)
     
   def enable_test_mode(self):
-    """ Enables Test-Mode (LFSR Enable) for Sensor """
+    """ Enables Test-Mode (LFSR Enable) for Sensor. """
     # Enables TestMode
     self._set_bits(CONST.SFCTL_ADDR, CONST.TEST_MODE_EN)
 
@@ -382,7 +386,7 @@ class BGT60TRxxModule:
   @micropython.viper
   def apply_anti_coupling_filter(self):
     """Anti Coupling filter for 
-    Reciever/Transmitter Antenna
+    Receiver/Transmitter Antenna
     """
     # Calculation: Typical: sig - mov_avg
     # y[i] = x[i] - 1/N sum_(k = i - (N-1))^(i)(x[k])

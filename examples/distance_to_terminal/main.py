@@ -97,8 +97,7 @@ range_resolution = radar_sensor.get_range_resolution() * 100 # in cm
 
 @micropython.native
 def detect_nearest_target(radar_sensor: BGT.BGT60TRxxModule):
-  """ Detect first peak in signal.
-  """
+  """ Detect first peak in signal. """
   for i in range(len(radar_sensor.fft_data)//2):
     if radar_sensor.fft_data[i] > detection_threshold_dB:
       print(">Peak detected at: {:.1f} cm".format(
@@ -108,14 +107,14 @@ def detect_nearest_target(radar_sensor: BGT.BGT60TRxxModule):
       return
 
 def read_FIFO(radar_sensor: BGT.BGT60TRxxModule):
-  """Read FIFO Stack of Sensor and prints the measured data""" 
+  """ Read FIFO Stack of Sensor and prints the measured data.""" 
   radar_sensor.read_distance()
   
   # enable line to also print detected peaks in cm
   detect_nearest_target(radar_sensor)
 
 def reset_and_restart(radar_sensor: BGT.BGT60TRxxModule):
-    """Reset FIFO and restart frame acquisition"""
+    """ Reset FIFO and restart frame acquisition. """
     radar_sensor.reset_fifo()
     radar_sensor.start_frame()
 
