@@ -1,12 +1,15 @@
 # ================================================
-# defines const Values needed for BGT60TRXX Sensor
+# Defines const values needed for BGT60TRXX Sensor
 # Samuel Weissenbacher, 03.2025
-#=================================================
+# ================================================
 
-# Register Mask and Offset Values
+from micropython import const
+
+# ===========================
+# Register Mask and Offsets
+# ===========================
 ADDR_MASK                = const(0xFE000000)
 ADDR_OFFSET              = const(25)
-
 DATA_MASK                = const(0x00FFFFFF)
 DATA_OFFSET              = const(0)
 
@@ -16,15 +19,19 @@ BURST_MODE_OFFSET        = const(17)
 
 GSR0_STATUS_FLAG_MASK    = const(0x0F)
 
+# SFCTL Register
 SFCTL_FIFO_CREF_MASK     = const(0x001FFF)
 SFCTL_FIFO_CREF_OFFSET   = const(0 << 0)
 
+# ADC0 Register
 ADC0_DIV_OFFSET          = const(14)
 ADC0_DIV_MASK            = const(0xFF << ADC0_DIV_OFFSET)
 
+# APU0 Register
 APU0_OFFSET              = const(0)
 APU0_MASK                = const(0xFFF << APU0_OFFSET)
 
+# PLL1 Registers
 PLL1_0_FSU_OFFSET        = const(0)
 PLL1_0_FSU_MASK          = const(0xFFFFFF << PLL1_0_FSU_OFFSET)
 
@@ -34,6 +41,7 @@ PLL1_1_RSU_MASK          = const(0xFFFFFF << PLL1_1_RSU_OFFSET)
 PLL1_2_RTU_OFFSET        = const(0)
 PLL1_2_RTU_MASK          = const(0x3FFF << PLL1_2_RTU_OFFSET)
 
+# CSU1_2 VGA Gain Registers
 CSU1_2_VGA_GAIN1_OFFSET  = const(2)
 CSU1_2_VGA_GAIN1_MASK    = const(0x7 << CSU1_2_VGA_GAIN1_OFFSET)
 
@@ -43,7 +51,9 @@ CSU1_2_VGA_GAIN2_MASK    = const(0x7 << CSU1_2_VGA_GAIN2_OFFSET)
 CSU1_2_VGA_GAIN3_OFFSET  = const(12)
 CSU1_2_VGA_GAIN3_MASK    = const(0x7 << CSU1_2_VGA_GAIN3_OFFSET)
 
-# Flags
+# ===========================
+# Control Flags
+# ===========================
 SFCTL_MISO_HS_READ       = const(1 << 16)
 SFCTL_FIFO_LP_MODE       = const(1 << 13)
 WRITE_EN                 = const(0x01000000)
@@ -58,7 +68,9 @@ MADC_ISOPD               = const(1 << 8)
 CS_EN                    = const(1 << 4)
 MADC_EN                  = const(1 << 10)
 
+# ===========================
 # Register Addresses
+# ===========================
 MAIN_ADDR                = const(0x00)
 ADC0_ADDR                = const(0x01)
 CHIP_ID_ADDR             = const(0x02)
@@ -148,11 +160,15 @@ SADC_RESULT_ADDR         = const(0x5E)
 FIFO_FSTAT_ADDR          = const(0x5F)
 FIFO_ADDR                = const(0x60)
 
-# FIFO
+# ===========================
+# FIFO Configuration
+# ===========================
 FIFO_SIZE                = const(8192)
 FIFO_SIZE_BYTE           = const(12288)
 BYTE_SIZE                = const(4)
 
+# FIFO burst mode enable command
+# ===========================
 # 0xFF = Adress; 
 # FIFO-Address is shifted by (<< 1)
 # Address 0x60 << 1 = 0xC0
@@ -161,49 +177,63 @@ BYTE_SIZE                = const(4)
 # and skip those values later
 ENABLE_BURST_MODE        = const(b'\xFF\xBD\x00\x00')
 
-# See Setup Saw-Tooth p.24
+# ===========================
+# Timing Configuration
+# ===========================
+# See Setup Saw-Tooth p.24 of BGT60TRxx Datasheet
 # T_SETUP > T_PAEN + T_SSTART - T_START
-T_SETUP                  = 60 # [6us * 8/t_sys]
+T_SETUP                  = const(60) # [6us * 8/t_sys]
 
-# Init Register Values for sensor
-init_register_list = {
-    MAIN_ADDR:      0x011e8270,
-    ADC0_ADDR:      0x03088210,
-    PACR1_ADDR:     0x09e967fd,
-    PACR2_ADDR:     0x0b0805b4,
-    SFCTL_ADDR:     0x0d1027ff,
-    SADC_CTRL_ADDR: 0x0f010700,
-    CSI_0_ADDR:     0x11000000,
-    CSI_1_ADDR:     0x13000000,
-    CSI_2_ADDR:     0x15000000,
-    CSCI_ADDR:      0x17000be0,
-    CSDS_0_ADDR:    0x19000000,
-    CSDS_1_ADDR:    0x1b000000,
-    CSDS_2_ADDR:    0x1d000000,
-    CSCDS_ADDR:     0x1f000b60,
-    CSU1_0_ADDR:    0x21103c51,
-    CSU1_1_ADDR:    0x231ff41f,
-    CSU1_2_ADDR:    0x25006f73,
-    CSC1_ADDR:      0x2d000490,
-    CSC2_ADDR:      0x3b000480,
-    CSC3_ADDR:      0x49000480,
-    CSC4_ADDR:      0x57000480,
-    CCR0_ADDR:      0x5911be0e,
-    CCR1_ADDR:      0x5b44c40a, # T_START = (0x0a * 8 + 10) * t_sys = 1.125us
-    CCR2_ADDR:      0x5d000000,
-    CCR3_ADDR:      0x5f787e1e, # T_PAEN = 0x1e * 8 * t_sys = 3us
-                                # T_SSTART = (0x1e * 8 + 1) * t_sys = 3.0125us
-    PLL1_0_ADDR:    0x61f5208a,
-    PLL1_1_ADDR:    0x630000a4,
-    PLL1_2_ADDR:    0x65000252,
-    PLL1_3_ADDR:    0x67000080,
-    PLL1_4_ADDR:    0x69000000,
-    PLL1_5_ADDR:    0x6b000000,
-    PLL1_6_ADDR:    0x6d000000,
-    PLL1_7_ADDR:    0x6f093910,
-    PLL2_7_ADDR:    0x7f000100,
-    PLL3_7_ADDR:    0x8f000100,
-    PLL4_7_ADDR:    0x9f000100,
-    RFT1_ADDR:      0xad000000,
-    NONE_ADDR:      0xb7000000,
-}
+# ===========================
+# Physical Constants
+# ===========================
+F_ADC_CLK = const(80_000_000)  # 80 MHz
+STEP_CHIRP_DIVIDER = const(8)
+SPEED_OF_LIGHT = const(300_000_000)  # 3e8 m/s
+
+# ===========================
+# Default Register Values
+# ===========================
+def get_init_register_list():
+    """Returns default initialization register values"""
+    return {
+        MAIN_ADDR:      0x011e8270,
+        ADC0_ADDR:      0x03088210,
+        PACR1_ADDR:     0x09e967fd,
+        PACR2_ADDR:     0x0b0805b4,
+        SFCTL_ADDR:     0x0d1027ff,
+        SADC_CTRL_ADDR: 0x0f010700,
+        CSI_0_ADDR:     0x11000000,
+        CSI_1_ADDR:     0x13000000,
+        CSI_2_ADDR:     0x15000000,
+        CSCI_ADDR:      0x17000be0,
+        CSDS_0_ADDR:    0x19000000,
+        CSDS_1_ADDR:    0x1b000000,
+        CSDS_2_ADDR:    0x1d000000,
+        CSCDS_ADDR:     0x1f000b60,
+        CSU1_0_ADDR:    0x21103c51,
+        CSU1_1_ADDR:    0x231ff41f,
+        CSU1_2_ADDR:    0x25006f73,
+        CSC1_ADDR:      0x2d000490,
+        CSC2_ADDR:      0x3b000480,
+        CSC3_ADDR:      0x49000480,
+        CSC4_ADDR:      0x57000480,
+        CCR0_ADDR:      0x5911be0e,
+        CCR1_ADDR:      0x5b44c40a, # T_START = (0x0a * 8 + 10) * t_sys = 1.125us
+        CCR2_ADDR:      0x5d000000,
+        CCR3_ADDR:      0x5f787e1e, # T_PAEN = 0x1e * 8 * t_sys = 3us
+                                    # T_SSTART = (0x1e * 8 + 1) * t_sys = 3.0125us
+        PLL1_0_ADDR:    0x61f5208a,
+        PLL1_1_ADDR:    0x630000a4,
+        PLL1_2_ADDR:    0x65000252,
+        PLL1_3_ADDR:    0x67000080,
+        PLL1_4_ADDR:    0x69000000,
+        PLL1_5_ADDR:    0x6b000000,
+        PLL1_6_ADDR:    0x6d000000,
+        PLL1_7_ADDR:    0x6f093910,
+        PLL2_7_ADDR:    0x7f000100,
+        PLL3_7_ADDR:    0x8f000100,
+        PLL4_7_ADDR:    0x9f000100,
+        RFT1_ADDR:      0xad000000,
+        NONE_ADDR:      0xb7000000,
+    }
